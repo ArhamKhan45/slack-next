@@ -1,13 +1,8 @@
-import { Button } from "@/components/ui/button";
+import AuthScreen from "@/src/features/auth/components/AuthScreen";
 import React from "react";
 
 const Home = () => {
-  return (
-    <div className="text-rose-500 font-bold">
-      Home
-      <Button>click me</Button>
-    </div>
-  );
+  return <AuthScreen />;
 };
 
 export default Home;
