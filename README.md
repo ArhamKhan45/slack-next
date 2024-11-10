@@ -12,3 +12,4 @@ Here's a high-level step-by-step guide for building a Slack clone:
    2. Set up the React provider{app router with SSA} ConvexAuthNextjsServerProvider in layout.tsx
    3. Client provider
    4. Add the middleware file
+   5. now setup the env with githubId and githubSecret and then import Github from auth/core/providers/github for github authentication and pass in the providers array of convexAuth of
