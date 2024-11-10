@@ -5,3 +5,4 @@ The ultimate team collaboration tool designed for seamless communication and pro
 Here's a high-level step-by-step guide for building a Slack clone:
 
 1. Authentication ui - signIn / signup page
+2. Database setup using convex -> created a tasks jsonl file the import it to convex as a table of task then wire up the convexClientProvider then written a get api query , and tested it on the task route, to check it is working properly or not
