@@ -1,6 +1,7 @@
+import React, { ChangeEvent, useState } from "react";
 import { useAuthActions } from "@convex-dev/auth/react";
+
 import { Button } from "@/components/ui/button";
-import { FcGoogle } from "react-icons/fc";
 import {
   Card,
   CardContent,
@@ -10,18 +11,24 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import React, { ChangeEvent, useState } from "react";
+
+import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
+
 import { SignInCardProps } from "@/types/auth/AuthScreen";
 
 const SignInCard = ({ setState }: SignInCardProps) => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [pending, setPending] = useState<boolean>(false);
   const { signIn } = useAuthActions();
 
   //  on provider for github and google
   const handleProviderSignIn = (value: "github" | "google") => {
-    signIn(value);
+    setPending(true);
+    signIn(value).finally(() => {
+      setPending(true);
+    });
   };
 
   return (
@@ -35,7 +42,7 @@ const SignInCard = ({ setState }: SignInCardProps) => {
       <CardContent className="space-y-5 px-0 pb-0">
         <form className="space-y-2.5">
           <Input
-            disabled={false}
+            disabled={pending}
             type="email"
             placeholder="Email"
             value={email}
@@ -45,7 +52,7 @@ const SignInCard = ({ setState }: SignInCardProps) => {
             required
           />
           <Input
-            disabled={false}
+            disabled={pending}
             type="password"
             placeholder="Password"
             value={password}
@@ -54,14 +61,19 @@ const SignInCard = ({ setState }: SignInCardProps) => {
             }}
             required
           />
-          <Button type="submit" className="w-full" size={"lg"} disabled={false}>
+          <Button
+            type="submit"
+            className="w-full"
+            size={"lg"}
+            disabled={pending}
+          >
             Continue
           </Button>
         </form>
         <Separator />
         <div className=" flex flex-col gap-y-5">
           <Button
-            disabled={false}
+            disabled={pending}
             onClick={() => void handleProviderSignIn("google")}
             variant={"outline"}
             size={"lg"}
@@ -71,7 +83,7 @@ const SignInCard = ({ setState }: SignInCardProps) => {
             Continue with Google
           </Button>
           <Button
-            disabled={false}
+            disabled={pending}
             onClick={() => void handleProviderSignIn("github")}
             variant={"outline"}
             size={"lg"}
