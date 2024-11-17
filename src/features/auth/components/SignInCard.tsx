@@ -14,13 +14,16 @@ import { Separator } from "@/components/ui/separator";
 
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
+import { TriangleAlert } from "lucide-react";
 
 import { SignInCardProps } from "@/types/auth/AuthScreen";
+import { onPasswordSignIn } from "@/src/features/auth/actions/AuthPassword";
 
 const SignInCard = ({ setState }: SignInCardProps) => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [pending, setPending] = useState<boolean>(false);
+  const [localError, setLocalError] = useState<string>("");
   const { signIn } = useAuthActions();
 
   //  on provider for github and google
@@ -39,8 +42,26 @@ const SignInCard = ({ setState }: SignInCardProps) => {
           Use your email or another service to continue
         </CardDescription>
       </CardHeader>
+      {!!localError && (
+        <div className="bg-destructive/20 p-3 rounded-md flex items-center gap-x-2 text-sm text-destructive mb-5">
+          <TriangleAlert className="size-4" />
+          <p>{localError}</p>
+        </div>
+      )}
       <CardContent className="space-y-5 px-0 pb-0">
-        <form className="space-y-2.5">
+        <form
+          className="space-y-2.5"
+          onSubmit={(e) =>
+            onPasswordSignIn(
+              e,
+              email,
+              password,
+              signIn,
+              setLocalError,
+              setPending
+            )
+          }
+        >
           <Input
             disabled={pending}
             type="email"

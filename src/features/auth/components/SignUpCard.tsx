@@ -1,5 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { FcGoogle } from "react-icons/fc";
+import { FaGithub } from "react-icons/fa";
+import { TriangleAlert } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -10,13 +12,27 @@ import {
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import React, { ChangeEvent, useState } from "react";
-import { FaGithub } from "react-icons/fa";
 import { SignUpCardProps } from "@/types/auth/AuthScreen";
+import { useAuthActions } from "@convex-dev/auth/react";
+import { onPasswordSignUp } from "../actions/AuthPassword";
 
 const SignUpCard = ({ setState }: SignUpCardProps) => {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [pending, setPending] = useState<boolean>(false);
+  const [localError, setLocalError] = useState<string>("");
+
+  const { signIn } = useAuthActions();
+
+  //  on provider for github and google
+  const handleProviderSignUp = (value: "github" | "google") => {
+    setPending(true);
+    signIn(value).finally(() => {
+      setPending(true);
+    });
+  };
 
   return (
     <Card className="w-full h-full p-8">
@@ -26,10 +42,40 @@ const SignUpCard = ({ setState }: SignUpCardProps) => {
           Use your email or another service to continue
         </CardDescription>
       </CardHeader>
+      {!!localError && (
+        <div className="bg-destructive/20 p-3 rounded-md flex items-center gap-x-2 text-sm text-destructive mb-5">
+          <TriangleAlert className="size-4" />
+          <p>{localError}</p>
+        </div>
+      )}
       <CardContent className="space-y-5 px-0 pb-0">
-        <form className="space-y-2.5">
+        <form
+          className="space-y-2.5"
+          onSubmit={(e) =>
+            onPasswordSignUp(
+              e,
+              name,
+              email,
+              password,
+              confirmPassword,
+              signIn,
+              setLocalError,
+              setPending
+            )
+          }
+        >
           <Input
-            disabled={false}
+            disabled={pending}
+            type="text"
+            placeholder="Full Name"
+            value={name}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setName(e.target.value)
+            }
+            required
+          />
+          <Input
+            disabled={pending}
             type="email"
             placeholder="Email"
             value={email}
@@ -39,7 +85,7 @@ const SignUpCard = ({ setState }: SignUpCardProps) => {
             required
           />
           <Input
-            disabled={false}
+            disabled={pending}
             type="password"
             placeholder="Password"
             value={password}
@@ -49,7 +95,7 @@ const SignUpCard = ({ setState }: SignUpCardProps) => {
             required
           />
           <Input
-            disabled={false}
+            disabled={pending}
             type="password"
             placeholder="Confirm Password"
             value={confirmPassword}
@@ -58,15 +104,20 @@ const SignUpCard = ({ setState }: SignUpCardProps) => {
             }}
             required
           />
-          <Button type="submit" className="w-full" size={"lg"} disabled={false}>
+          <Button
+            type="submit"
+            className="w-full"
+            size={"lg"}
+            disabled={pending}
+          >
             Continue
           </Button>
         </form>
         <Separator />
         <div className=" flex flex-col gap-y-5">
           <Button
-            disabled={false}
-            onClick={() => {}}
+            disabled={pending}
+            onClick={() => void handleProviderSignUp("google")}
             variant={"outline"}
             size={"lg"}
             className="w-full relative"
@@ -75,8 +126,8 @@ const SignUpCard = ({ setState }: SignUpCardProps) => {
             Continue with Google
           </Button>
           <Button
-            disabled={false}
-            onClick={() => {}}
+            disabled={pending}
+            onClick={() => void handleProviderSignUp("github")}
             variant={"outline"}
             size={"lg"}
             className="w-full relative"
