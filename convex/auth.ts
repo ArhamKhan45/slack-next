@@ -10,6 +10,7 @@ const CustomPassword = Password<DataModel>({
     return {
       email: params.email as string,
       name: params.name as string,
+      password: params.password as string,
     };
   },
 });
