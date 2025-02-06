@@ -1,6 +1,8 @@
 import React from "react";
+import bcrypt from "bcryptjs";
 
-export const onPasswordSignUp = (
+// Sign-up using password
+export const onPasswordSignUp = async (
   e: React.FormEvent<HTMLFormElement>,
   name: string,
   email: string,
@@ -13,21 +15,31 @@ export const onPasswordSignUp = (
   e.preventDefault();
 
   if (password !== confirmPassword) {
-    setLocalError("Password do not matched");
+    setLocalError("Passwords do not match");
     return;
   }
+
   setPending(true);
 
-  signIn("password", { name, email, password, flow: "signUp" })
-    .catch(() => {
-      setLocalError("Something went wrong");
-    })
-    .finally(() => {
-      console.log(email, name, password);
-      setPending(false);
+  try {
+    // Hash the password before proceeding
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await signIn("password", {
+      name,
+      email,
+      password: hashedPassword,
+      flow: "signUp",
     });
+  } catch (error) {
+    console.error("Sign-up error:", error);
+    setLocalError("Something went wrong");
+  } finally {
+    setPending(false);
+  }
 };
 
+// signIn using password
 export const onPasswordSignIn = (
   e: React.FormEvent<HTMLFormElement>,
   email: string,
@@ -37,7 +49,6 @@ export const onPasswordSignIn = (
   setPending: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
   e.preventDefault();
-
   setPending(true);
 
   signIn("password", { email, password, flow: "signIn" })
